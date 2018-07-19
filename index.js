@@ -142,7 +142,7 @@ async function main() {
     console.log('✅ metadata saved');
 
     // save the latest
-    fs.writeFile(LATEST_FILENAME, GITHUB_METADATA_FILE, 'utf8', handleFailure);
+    await writeFile(LATEST_FILENAME, GITHUB_METADATA_FILE, 'utf8', handleFailure);
 
     console.log('✅ late update time saved', LATEST_FILENAME, GITHUB_METADATA_FILE);
 

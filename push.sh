@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -xe
+set -x
 
 git config --global user.email "info@veggiemonk.ovh"
 
