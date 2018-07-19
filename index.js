@@ -1,5 +1,6 @@
-const fs = require('fs');
-const { promisify } = require('util');
+const path = require('path');
+// const { promisify } = require('util');
+const fs = require('fs-extra');
 const fetch = require('node-fetch');
 const dayjs = require('dayjs');
 
@@ -14,16 +15,18 @@ if (!process.env.TOKEN) {
   process.exit(1);
 }
 
+const homeDir = process.env.PWD;
+
+console.log({homeDir})
+
 // --- ENV VAR ---
 const BATCH_SIZE = parseInt(process.env.BATCH_SIZE, 10) || 10;
 const DELAY = parseInt(process.env.DELAY, 10) || 3000;
 // --- FILENAME ---
 const README = 'README.md';
-const GITHUB_METADATA_FILE = `data/${dayjs().format(
-  'YYYY-MM-DDTHH.mm.ss',
-)}-fetched_repo_data.json`;
-const LATEST_FILENAME = 'data/latest';
-const GITHUB_REPOS = 'data/list_repos.json';
+const GITHUB_METADATA_FILE = `data/${dayjs().format('YYYY-MM-DDTHH.mm.ss')}-fetched_repo_data.json`;
+const LATEST_FILENAME = path.join(homeDir, 'data/latest');
+const GITHUB_REPOS = path.join(homeDir,'data/list_repos.json');
 // --- HTTP ---
 const API = 'https://api.github.com/';
 const options = {
@@ -36,8 +39,8 @@ const options = {
 };
 
 const removeHost = x => x.slice('https://github.com/'.length, x.length);
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
+// const readFile = promisify(fs.readFile);
+// const writeFile = promisify(fs.writeFile);
 const barLine = console.draft('Starting batch...');
 const handleFailure = err => {
   if (err) console.error('❌ ERROR', err);
@@ -111,7 +114,7 @@ function shouldUpdate(fileLatestUpdate) {
 
 async function main() {
   try {
-    const getLatest = await readFile(LATEST_FILENAME, {
+    const getLatest = await fs.readFile(LATEST_FILENAME, {
       encoding: 'utf8',
     })
     if (!shouldUpdate(getLatest)) {
@@ -126,7 +129,7 @@ async function main() {
       'https://github.com/sindresorhus/awesome',
       'https://github.com/ashmckenzie/percheron',
     ];
-    await writeFile(
+    await fs.writeFile(
       GITHUB_REPOS,
       JSON.stringify(githubRepos, null, 2),
       handleFailure,
@@ -134,15 +137,19 @@ async function main() {
 
     const metadata = await batchFetchRepoMetadata(githubRepos);
 
-    await writeFile(
+    console.log('writing metadata to disk...')
+    await fs.writeFile(
       GITHUB_METADATA_FILE,
       JSON.stringify(metadata, null, 2),
       handleFailure,
     );
     console.log('✅ metadata saved');
 
-    // save the latest
-    await writeFile(LATEST_FILENAME, GITHUB_METADATA_FILE, 'utf8', handleFailure);
+    console.log('removing latest...')
+    await fs.remove(LATEST_FILENAME);
+
+    console.log('writing latest...');
+    await fs.writeFile(LATEST_FILENAME, GITHUB_METADATA_FILE, 'utf8', handleFailure);
 
     console.log('✅ late update time saved', LATEST_FILENAME, GITHUB_METADATA_FILE);
 
