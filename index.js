@@ -116,6 +116,7 @@ async function main() {
       console.log('Last update was less than a day ago 😅. Exiting...');
       process.exit(1);
     }
+
     const githubRepos = [
       'https://github.com/veggiemonk/awesome-docker',
       'https://github.com/kubernetes/kubernetes',

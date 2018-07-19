@@ -21,7 +21,7 @@ before_script:
 
 script:
   - awesome_bot README.md --white-list edit/master,sindresorhus/awesome,www.udacity.com,screwdriver.cd,veggiemonk/awesome-docker
-  - TOKEN=$GITHUB_TOKEN npm test && ./push.sh
+  - TOKEN=$GITHUB_TOKEN npm test
 
 after_success:
   - ./push.sh
