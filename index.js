@@ -97,6 +97,7 @@ async function batchFetchRepoMetadata(githubRepos) {
 
 function shouldUpdate(fileLatestUpdate) {
   if (!fileLatestUpdate) return true;
+
   const hours = fileLatestUpdate.slice(
     'data/YYYY-MM-DDT'.length,
     'data/YYYY-MM-DDTHH'.length,
@@ -141,8 +142,9 @@ async function main() {
     console.log('✅ metadata saved');
 
     // save the latest
-    fs.writeFile(LATEST_FILENAME, GITHUB_METADATA_FILE, handleFailure);
-    console.log('✅ late update time saved', LATEST_FILENAME);
+    fs.writeFile(LATEST_FILENAME, GITHUB_METADATA_FILE, 'utf8', handleFailure);
+
+    console.log('✅ late update time saved', LATEST_FILENAME, GITHUB_METADATA_FILE);
 
     console.log('gracefully shutting down.');
     process.exit();
