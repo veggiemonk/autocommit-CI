@@ -141,6 +141,11 @@ async function main() {
 
     // save the latest
     fs.writeFile(LATEST_FILENAME, GITHUB_METADATA_FILE, handleFailure);
+    console.log('✅ late update time saved');
+
+    console.log('gracefully shutting down.');
+    process.exit();
+
   } catch (err) {
     handleFailure(err);
   }
